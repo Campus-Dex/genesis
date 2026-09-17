@@ -1,122 +1,68 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Boot from './components/Boot'
+import Nav from './components/Nav'
+import Hero from './components/Hero'
+import Transmission from './components/Transmission'
+import Events from './components/Events'
+import Countdown from './components/Countdown'
+import Finale from './components/Finale'
+import { useLenis } from './hooks/useLenis'
+import { sceneState } from './scene/state'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const Scene = lazy(() => import('./scene/Scene'))
+
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+const mobile = window.matchMedia('(max-width: 767px)').matches
+const BOOT_KEY = 'genesis-booted'
+
+function alreadyBooted() {
+  try {
+    return sessionStorage.getItem(BOOT_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+export default function App() {
+  const [booted, setBooted] = useState(() => reducedMotion || alreadyBooted())
+  useLenis({ enabled: !reducedMotion, locked: !booted })
+
+  const onBootDone = useCallback(() => {
+    try {
+      sessionStorage.setItem(BOOT_KEY, '1')
+    } catch {
+      // storage unavailable: boot simply replays next visit
+    }
+    setBooted(true)
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('is-booting', !booted)
+    if (booted) {
+      sceneState.booted = true
+      ScrollTrigger.refresh()
+    }
+  }, [booted])
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
+      {!booted && <Boot onDone={onBootDone} />}
+      <Suspense fallback={null}>
+        <Scene reducedMotion={reducedMotion} mobile={mobile} />
+      </Suspense>
+      <Nav />
+      <main id="main" className="page">
+        <Hero ready={booted} reducedMotion={reducedMotion} />
+        <Transmission reducedMotion={reducedMotion} />
+        <Events />
+        <Countdown />
+        <Finale />
+      </main>
     </>
   )
 }
-
-export default App
