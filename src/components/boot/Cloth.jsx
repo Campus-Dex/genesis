@@ -4,11 +4,14 @@ import * as THREE from 'three'
 import { drawBoot, BOOT_FONT } from './drawBoot'
 import './ClothMaterial'
 
+const FOV = 38
+
 export default function Cloth({ pct, onReady }) {
   const { size } = useThree()
   const left = useRef()
   const right = useRef()
   const texture = useRef(null)
+  const fittedHeight = useRef(0)
 
   useEffect(() => {
     const tex = new THREE.CanvasTexture(document.createElement('canvas'))
@@ -46,6 +49,16 @@ export default function Cloth({ pct, onReady }) {
   }, [onReady])
 
   useFrame((state) => {
+    // place the camera so a plane of viewport size at z=0 exactly fills the view
+    if (fittedHeight.current !== state.size.height) {
+      fittedHeight.current = state.size.height
+      const cam = state.camera
+      cam.fov = FOV
+      cam.position.set(0, 0, state.size.height / 2 / Math.tan((FOV / 2) * (Math.PI / 180)))
+      cam.near = 1
+      cam.far = cam.position.z * 4
+      cam.updateProjectionMatrix()
+    }
     const t = state.clock.elapsedTime
     left.current.uTime = t
     right.current.uTime = t
@@ -56,14 +69,16 @@ export default function Cloth({ pct, onReady }) {
     uAspect: size.width / size.height,
   }
 
+  const plane = [size.width, size.height, 96, 64]
+
   return (
     <>
       <mesh>
-        <planeGeometry args={[size.width, size.height, 96, 64]} />
+        <planeGeometry args={plane} />
         <clothMaterial ref={left} uSide={-1} {...shared} />
       </mesh>
       <mesh>
-        <planeGeometry args={[size.width, size.height, 96, 64]} />
+        <planeGeometry args={plane} />
         <clothMaterial ref={right} uSide={1} {...shared} />
       </mesh>
     </>

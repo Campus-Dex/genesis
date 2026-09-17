@@ -7,9 +7,12 @@ import Cloth from './boot/Cloth'
 const CUT_A = { x: 0.96, y: -0.08 } // screen fractions, y down (uCutA with y flipped)
 const CUT_B = { x: 0.04, y: 1.08 }
 const COUNT_DURATION = 1.7
-const SLASH_AT = COUNT_DURATION
-const DONE_AT = 3.5
-const END_AT = 3.9
+const SWAY_AT = COUNT_DURATION // the whole sheet starts swinging
+const STORM_AT = SWAY_AT + 1.0 // wind hardens
+const SLASH_AT = STORM_AT + 0.35 // blade splits it
+const GUST_AT = SLASH_AT + 0.45 // pieces ripped away
+const DONE_AT = GUST_AT + 0.55
+const END_AT = GUST_AT + 1.15
 
 function Blade() {
   return (
@@ -46,6 +49,11 @@ function addSlash(timeline, root, materials) {
   gsap.set(streak, { x: ax, y: ay, rotation: angle, width: length, scaleX: 0, transformOrigin: '0 50%' })
 
   timeline
+    // 1. the whole sheet starts to swing
+    .to(materials, { uSway: 1, duration: 1.1, ease: 'sine.out' }, SWAY_AT)
+    // 2. wind hardens
+    .to(materials, { uStorm: 1, duration: 0.6, ease: 'power2.in' }, STORM_AT)
+    // 3. blade splits it
     .set(blade, { opacity: 1 }, SLASH_AT)
     .to(blade, { x: bx, y: by, duration: 0.28, ease: 'power2.in' }, SLASH_AT)
     .to(materials, { uSlash: 1, duration: 0.28, ease: 'power2.in' }, SLASH_AT)
@@ -54,10 +62,10 @@ function addSlash(timeline, root, materials) {
     .fromTo(flash, { opacity: 0 }, { opacity: 0.9, duration: 0.05, ease: 'none' }, SLASH_AT + 0.22)
     .to(flash, { opacity: 0, duration: 0.35, ease: 'expo.out' }, SLASH_AT + 0.27)
     .to(streak, { opacity: 0, duration: 0.6, ease: 'expo.out' }, SLASH_AT + 0.3)
-    .to(materials, { uSway: 1, duration: 1.0, ease: 'expo.out' }, SLASH_AT + 0.2)
-    .to(materials, { uGlow: 0, duration: 1.2, ease: 'power2.out' }, SLASH_AT + 0.4)
-    .to(materials[1], { uGust: 1, duration: 1.0, ease: 'power3.in' }, SLASH_AT + 1.2)
-    .to(materials[0], { uGust: 1, duration: 1.0, ease: 'power3.in' }, SLASH_AT + 1.35)
+    .to(materials, { uGlow: 0, duration: 1.0, ease: 'power2.out' }, SLASH_AT + 0.3)
+    // 4. the bottom-right piece (barely attached) tears away first, then the rest
+    .to(materials[0], { uGust: 1, duration: 0.9, ease: 'power3.in' }, GUST_AT)
+    .to(materials[1], { uGust: 1, duration: 0.9, ease: 'power3.in' }, GUST_AT + 0.2)
 }
 
 export default function Boot({ onDone, onExit }) {
@@ -87,17 +95,15 @@ export default function Boot({ onDone, onExit }) {
     timeline.call(onDone, [], DONE_AT)
     timeline.to({}, { duration: END_AT - DONE_AT }, DONE_AT)
     tl.current = timeline
+    if (import.meta.env.DEV) window.__bootTl = timeline
     build()
 
     const skip = (e) => {
-      if (e.type === 'keydown' && e.key === 'Tab') return
-      timeline.progress(1)
+      if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') timeline.progress(1)
     }
     window.addEventListener('keydown', skip)
-    window.addEventListener('pointerdown', skip)
     return () => {
       window.removeEventListener('keydown', skip)
-      window.removeEventListener('pointerdown', skip)
       timeline.kill()
       tl.current = null
       built.current = false
@@ -118,8 +124,7 @@ export default function Boot({ onDone, onExit }) {
   return (
     <div className={`boot${live ? ' boot--live' : ''}`} ref={root} role="status" aria-live="polite">
       <Canvas
-        orthographic
-        camera={{ position: [0, 0, 100], zoom: 1, near: 0.1, far: 1000 }}
+        camera={{ fov: 38, position: [0, 0, 1000], near: 1, far: 4000 }}
         dpr={[1, 2]}
         gl={{ antialias: true, alpha: true }}
         style={{ position: 'absolute', inset: 0 }}

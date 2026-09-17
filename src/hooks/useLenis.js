@@ -15,7 +15,6 @@ export function useLenis({ enabled, locked }) {
     lenis.on('scroll', ScrollTrigger.update)
     const tick = (time) => lenis.raf(time * 1000)
     gsap.ticker.add(tick)
-    gsap.ticker.lagSmoothing(0)
     return () => {
       gsap.ticker.remove(tick)
       lenis.destroy()
@@ -26,8 +25,14 @@ export function useLenis({ enabled, locked }) {
   useEffect(() => {
     const lenis = lenisRef.current
     if (!lenis) return
-    if (locked) lenis.stop()
-    else lenis.start()
+    if (locked) {
+      lenis.stop()
+    } else {
+      // lag smoothing off is what Lenis wants for smooth scroll, but while the
+      // boot plays it would let the timeline skip ahead during shader compiles
+      gsap.ticker.lagSmoothing(0)
+      lenis.start()
+    }
   }, [locked])
 
   return lenisRef

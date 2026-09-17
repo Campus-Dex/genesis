@@ -18,6 +18,7 @@ const mobile = window.matchMedia('(max-width: 767px)').matches
 const BOOT_KEY = 'genesis-booted'
 
 function alreadyBooted() {
+  if (import.meta.env.DEV) return false
   try {
     return sessionStorage.getItem(BOOT_KEY) === '1'
   } catch {
