@@ -27,6 +27,7 @@ function alreadyBooted() {
 
 export default function App() {
   const [booted, setBooted] = useState(() => reducedMotion || alreadyBooted())
+  const [bootVisible, setBootVisible] = useState(!booted)
   useLenis({ enabled: !reducedMotion, locked: !booted })
 
   const onBootDone = useCallback(() => {
@@ -37,6 +38,7 @@ export default function App() {
     }
     setBooted(true)
   }, [])
+  const onBootExit = useCallback(() => setBootVisible(false), [])
 
   useEffect(() => {
     document.documentElement.classList.toggle('is-booting', !booted)
@@ -51,7 +53,7 @@ export default function App() {
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      {!booted && <Boot onDone={onBootDone} />}
+      {bootVisible && <Boot onDone={onBootDone} onExit={onBootExit} />}
       <Suspense fallback={null}>
         <Scene reducedMotion={reducedMotion} mobile={mobile} />
       </Suspense>

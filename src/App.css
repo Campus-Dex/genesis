@@ -82,58 +82,54 @@ html.is-booting {
   position: fixed;
   inset: 0;
   z-index: var(--z-boot);
-  background: var(--bg);
-  color: var(--ink);
-  clip-path: inset(0 0 0 0);
+  overflow: hidden;
+  /* fabric color until the cloth's first WebGL frame, then transparent so the cut reveals the page */
+  background: #17151f;
 }
 
-.boot--exit {
-  clip-path: inset(0 0 0 100%);
-  transition: clip-path 700ms var(--ease-out-expo);
+.boot--live {
+  background: transparent;
 }
 
-.boot__frame {
+.boot canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.boot__blade {
   position: absolute;
-  inset: var(--gutter);
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  top: 0;
+  left: 0;
+  width: clamp(240px, 36vw, 520px);
+  height: auto;
+  opacity: 0;
+  filter: drop-shadow(0 0 14px oklch(0.85 0.12 294 / 0.9));
 }
 
-.boot__name {
-  font-size: 0.85rem;
-  color: var(--muted);
+.boot__streak {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  margin-top: -1.5px;
+  background: linear-gradient(to right, transparent, oklch(0.92 0.1 75), #fff);
+  filter: blur(1.5px);
+  box-shadow: 0 0 24px 4px oklch(0.8 0.15 75 / 0.6);
 }
 
-.boot__name span {
-  color: var(--accent);
-}
-
-.boot__pct {
-  align-self: end;
-  justify-self: end;
-  font-size: clamp(6rem, 24vw, 18rem);
-  line-height: 0.85;
-  letter-spacing: 0;
-  color: var(--primary-glow);
-}
-
-.boot__lines {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-size: 0.8rem;
-  color: var(--muted);
-  min-height: 4.5rem;
-}
-
-.boot__lines li:last-child {
-  color: var(--accent);
+.boot__flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  mix-blend-mode: screen;
 }
 
 .boot__skip {
   position: absolute;
-  right: 0;
-  top: 0;
+  right: var(--gutter);
+  top: var(--gutter);
+  pointer-events: auto;
   padding: 0.5rem 0.9rem;
   background: transparent;
   border: 1px solid var(--line);
