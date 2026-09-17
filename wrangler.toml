@@ -1,0 +1,13 @@
+name = "genesis-campusdex"
+main = "worker/index.js"
+compatibility_date = "2026-09-17"
+
+[assets]
+directory = "dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "genesis-db"
+database_id = "ced0d779-0e46-48d2-91c4-c8e0aed051d9"
