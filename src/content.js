@@ -7,11 +7,11 @@ export const fest = {
   description: [
     'Genesis is the annual technical festival of Placeholder Institute of Technology, where 4,000 students from 120 campuses build, break, and compete across three days.',
     'Hackathons that run through the night. Robotics on a floor that used to be a parking deck. A keynote stage lit like a runway.',
-    'This year the city wakes on the 13th of March. Registration is open.',
+    'This year the city wakes on the 10th of October. Registration is open.',
   ],
   // ISO string with timezone; the countdown targets this instant.
-  startsAt: '2026-03-13T09:00:00+05:30',
-  dateLabel: '13 – 15 MAR 2026',
+  startsAt: '2026-10-10T09:00:00+05:30',
+  dateLabel: '10 – 12 OCT 2026',
   venue: 'PLACEHOLDER INSTITUTE OF TECHNOLOGY',
   city: 'HYDERABAD, IN',
   coordinates: '17.3850° N, 78.4867° E',
@@ -63,12 +63,26 @@ export const events = [
     day: 'Day 3',
     span: 'tall',
   },
+  {
+    id: 'aiarena',
+    name: 'AI Arena',
+    blurb: 'Your agent versus theirs. One bracket, no human hands on the keys.',
+    day: 'Day 2',
+    span: 'wide',
+  },
+  {
+    id: 'blindcode',
+    name: 'Blind Coding',
+    blurb: 'Monitors off. Write it clean the first time or not at all.',
+    day: 'Day 1',
+    span: 'base',
+  },
 ]
 
 export const schedule = [
-  { day: 'Day 1', date: '13 Mar', beats: ['Gates open 09:00', 'Opening ceremony', 'Hackathon begins 18:00'] },
-  { day: 'Day 2', date: '14 Mar', beats: ['Robowars finals', 'Keynote stage', 'Hackathon judging 06:00'] },
-  { day: 'Day 3', date: '15 Mar', beats: ['Drone racing', 'Project showcase', 'Closing 21:00'] },
+  { day: 'Day 1', date: '10 Oct', beats: ['Gates open 09:00', 'Opening ceremony', 'Hackathon begins 18:00'] },
+  { day: 'Day 2', date: '11 Oct', beats: ['Robowars finals', 'Keynote stage', 'Hackathon judging 06:00'] },
+  { day: 'Day 3', date: '12 Oct', beats: ['Drone racing', 'Project showcase', 'Closing 21:00'] },
 ]
 
 export const socials = [

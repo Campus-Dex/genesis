@@ -24,6 +24,8 @@ export default function Nav() {
       <nav aria-label="Primary">
         <a href="#events">Events</a>
         <a href="#schedule">Schedule</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#login">Login</a>
         <a href={fest.registerUrl} className="nav__cta">
           Register
         </a>
