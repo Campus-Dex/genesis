@@ -13,8 +13,8 @@ export const fest = {
   startsAt: '2026-10-10T09:00:00+05:30',
   dateLabel: '10 – 12 OCT 2026',
   venue: 'PLACEHOLDER INSTITUTE OF TECHNOLOGY',
-  city: 'HYDERABAD, IN',
-  coordinates: '17.3850° N, 78.4867° E',
+  city: 'SONIPAT, HR',
+  coordinates: '28.9931° N, 77.0151° E',
   registerUrl: '#register',
   organizerUrl: 'https://campusdex.com',
 }
